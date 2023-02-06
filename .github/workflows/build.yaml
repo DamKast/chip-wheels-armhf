@@ -46,8 +46,8 @@ jobs:
         strategy:
             matrix:
                 arch:
-                    - name: cross-armv7
-                      container: damienkastner/chip-build-crosscompile-armhf:latest
+                    - name: x86_64_cross_armhf
+                      container: damienkastner/chip-build-crosscompile-armhf:0.6.25
                       runner: ubuntu-latest
 
         runs-on: ${{ matrix.arch.runner }}
@@ -71,8 +71,8 @@ jobs:
                   GITHUB_CONTEXT: ${{ toJSON(github) }}
               run: echo "$GITHUB_CONTEXT"
               working-directory: ./
-            # - name: Checkout build repository
-            #   uses: actions/checkout@v3
+            - name: Checkout build repository
+              uses: actions/checkout@v3
             - name: Checkout CHIP SDK repository
               uses: actions/checkout@v3
               with:
@@ -81,11 +81,11 @@ jobs:
                   path: ./project-chip
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
-            # - name: Apply patches
-            #   run: |
-            #       patch -p1 < ../0001-Support-custom-platform-tag.patch
-            #       patch -p1 < ../0002-Revert-Python-dependencies.patch
-            #       patch -p1 < ../0003-Use-data-as-platform-storage-location.patch
+            - name: Apply patches
+              run: |
+                  patch -p1 < ../0001-Support-custom-platform-tag.patch
+                  patch -p1 < ../0002-Revert-Python-dependencies.patch
+                  patch -p1 < ../0003-Use-data-as-platform-storage-location.patch
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build, Run Build and Run Tests
