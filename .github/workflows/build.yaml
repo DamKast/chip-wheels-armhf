@@ -92,7 +92,7 @@ jobs:
               run: |
                   scripts/build/gn_gen.sh --args=" \
                                                   target_os=\"linux\" \
-                                                  target_arch=\"arm\" \
+                                                  target_cpu=\"arm\" \
                                                   sysroot=\"/opt/raspberry-armhf-sysroot\" \
                                                   enable_rtti=true \
                                                   enable_pylib=true \
