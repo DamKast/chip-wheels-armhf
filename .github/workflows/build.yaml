@@ -120,6 +120,7 @@ jobs:
               if: startsWith(github.ref, 'refs/tags/')
               with:
                 files: project-chip/out/controller/python/*.whl
+
             # - name: Upload wheels to PyPI
             #   if: startsWith(github.ref, 'refs/tags/')
             #   env:
