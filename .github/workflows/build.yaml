@@ -103,8 +103,11 @@ jobs:
                                                   chip_python_package_prefix=\"chip\" \
                                                   "
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
-            - name: Checkout build repository
-              uses: actions/checkout@v2
+            - name: Modify run_in_build_env.sh script
+              run: |
+                sed -i 's|sudo env|if command -v sudo > \/dev\/null; then sudo env|' scripts/run_in_build_env.sh
+                sed -i '/sudo env/a else env' scripts/run_in_build_env.sh
+                sed -i '/sudo env/a fi' scripts/run_in_build_env.sh
             - name: Run Python library specific unit tests
               uses: pguyot/arm-runner-action@v2 
               with:
