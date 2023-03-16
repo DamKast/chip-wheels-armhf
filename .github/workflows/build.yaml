@@ -108,6 +108,9 @@ jobs:
             - name: Run Python library specific unit tests
               uses: pguyot/arm-runner-action@v2 
               with:
+                cpu: cortex-a7
+                base_image: raspios_lite:latest
+                cpu_info: raspberrypi_3b
                 commands: |
                     scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-${{ needs.build_prepare.outputs.version }}-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
                     scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
