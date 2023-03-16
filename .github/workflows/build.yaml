@@ -103,12 +103,20 @@ jobs:
                                                   chip_python_package_prefix=\"chip\" \
                                                   "
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
+            - name: Upload wheels
+              uses: actions/upload-artifact@v2
+              with:
+                name: chip-wheels
+                path: project-chip/out/controller/python/*.whl
+
             - name: Run Python library specific unit tests
-              run: |
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-${{ needs.build_prepare.outputs.version }}-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
-                  scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
+              uses: pguyot/arm-runner-action@v2 
+              with:
+                commands: |
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-${{ needs.build_prepare.outputs.version }}-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
+                    scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
             - name: Upload wheels as artifacts
               uses: actions/upload-artifact@v3
               with:
