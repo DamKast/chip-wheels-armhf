@@ -103,6 +103,8 @@ jobs:
                                                   chip_python_package_prefix=\"chip\" \
                                                   "
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
+            - name: Checkout build repository
+              uses: actions/checkout@v2
             - name: Run Python library specific unit tests
               uses: pguyot/arm-runner-action@v2 
               with:
