@@ -1,13 +1,3 @@
-diff --git a/.gitignore b/.gitignore
-index 4c17bb63a..a93b8f70f 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -80,3 +80,5 @@ examples/thermostat/ameba/build
- # https://github.com/espressif/idf-component-manager#using-with-a-project
- examples/*/esp32/managed_components
- examples/*/esp32/dependencies.lock
-+
-+third_party/
 diff --git a/.vscode/settings.json b/.vscode/settings.json
 index a8e2b99d4..82af1bb86 100644
 --- a/.vscode/settings.json
