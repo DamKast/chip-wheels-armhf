@@ -1,3 +1,13 @@
+diff --git a/.gitignore b/.gitignore
+index 4c17bb63a..a93b8f70f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -80,3 +80,5 @@ examples/thermostat/ameba/build
+ # https://github.com/espressif/idf-component-manager#using-with-a-project
+ examples/*/esp32/managed_components
+ examples/*/esp32/dependencies.lock
++
++third_party/
 diff --git a/.vscode/settings.json b/.vscode/settings.json
 index a8e2b99d4..82af1bb86 100644
 --- a/.vscode/settings.json
@@ -43,7 +53,7 @@ index eaced9431..b2cd77408 100644
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..11d07904a 100644
+index 3626dac00..7dadc46f2 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -128,6 +128,7 @@ class DCState(enum.IntEnum):
@@ -54,7 +64,25 @@ index 3626dac00..11d07904a 100644
  
  
  class CommissionableNode(discovery.CommissionableNode):
-@@ -1274,6 +1275,10 @@ class ChipDeviceControllerBase():
+@@ -385,7 +386,17 @@ class ChipDeviceControllerBase():
+             # Error 50 is a timeout
+             return False
+         return self._ChipStack.commissioningEventRes.is_success
++    
++    def UnpairDevice(self, nodeid: int):
++        self.CheckIsActive()
++
++        self.state = DCState.DECOMMISSIONING
+ 
++        return self._ChipStack.CallAsync(
++            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
++                self.devCtrl, nodeid)
++        )
++    
+     def CloseBLEConnection(self):
+         self.CheckIsActive()
+ 
+@@ -1274,6 +1285,10 @@ class ChipDeviceControllerBase():
                  c_void_p, c_char_p, c_uint64]
              self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
  
@@ -65,23 +93,6 @@ index 3626dac00..11d07904a 100644
              self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
                  c_void_p, c_uint64]
              self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
-@@ -1537,6 +1542,16 @@ class ChipDeviceController(ChipDeviceControllerBase):
-         if not self._ChipStack.commissioningCompleteEvent.isSet():
-             return False
-         return self._ChipStack.commissioningEventRes == 0
-+    
-+    def UnpairDevice(self, nodeid: int):
-+        self.CheckIsActive()
-+
-+        self.state = DCState.DECOMMISSIONING
-+
-+        return self._ChipStack.CallAsync(
-+            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
-+                self.devCtrl, nodeid)
-+        )
- 
-     def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
-         """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode` """
 diff --git a/third_party/bouffalolab/repo b/third_party/bouffalolab/repo
 index 890577da8..dc526317d 160000
 --- a/third_party/bouffalolab/repo
