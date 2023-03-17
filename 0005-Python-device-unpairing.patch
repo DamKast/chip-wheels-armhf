@@ -19,7 +19,7 @@ index 3344a8105..a1ece2c50 160000
 -Subproject commit 3344a8105f8dfecb95832f369733cf6f863a1662
 +Subproject commit a1ece2c500cf179db8f0c7dbc7bb8f3ace562142
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..cb324e490 100644
+index eaced9431..b2cd77408 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -131,6 +131,7 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
@@ -34,16 +34,16 @@ index eaced9431..cb324e490 100644
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
-+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId)
++PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 +{
-+    return ToPyChipError(devCtrl->UnpairDevice(remoteDeviceId));
++    return ToPyChipError(devCtrl->UnpairDevice(nodeid));
 +}
 +
  PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..447b56950 100644
+index 3626dac00..11d07904a 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -128,6 +128,7 @@ class DCState(enum.IntEnum):
@@ -70,7 +70,7 @@ index 3626dac00..447b56950 100644
              return False
          return self._ChipStack.commissioningEventRes == 0
 +    
-+    def UnpairDevice(self, setupPayload: str, nodeid: int):
++    def UnpairDevice(self, nodeid: int):
 +        self.CheckIsActive()
 +
 +        self.state = DCState.DECOMMISSIONING
