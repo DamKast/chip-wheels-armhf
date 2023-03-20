@@ -23,7 +23,7 @@ index eaced9431..b2cd77408 100644
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..bffe6ffa7 100644
+index 3626dac00..818643144 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -385,7 +385,15 @@ class ChipDeviceControllerBase():
@@ -34,10 +34,10 @@ index 3626dac00..bffe6ffa7 100644
 +    def UnpairDevice(self, nodeid: int):
 +        self.CheckIsActive()
  
-+        return self._ChipStack.CallAsync(
++        return self._ChipStack.Call(
 +            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
 +                self.devCtrl, nodeid)
-+        ).raise_on_error()
++        )
 +    
      def CloseBLEConnection(self):
          self.CheckIsActive()
