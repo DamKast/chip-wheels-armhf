@@ -1,5 +1,5 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..3d4c37946 100644
+index eaced9431..b2cd77408 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -131,6 +131,7 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
@@ -10,21 +10,20 @@ index eaced9431..3d4c37946 100644
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -386,6 +387,12 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +387,11 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
 +PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 +{
-+    PyReturnErrorOnFailure(ToPyChipError(devCtrl->UnpairDevice(nodeid)));
-+    return ToPyChipError(CHIP_NO_ERROR);
++    return ToPyChipError(devCtrl->UnpairDevice(nodeid));
 +}
 +
  PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..63b2543b2 100644
+index 3626dac00..5e5e6786d 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -385,7 +385,15 @@ class ChipDeviceControllerBase():
@@ -35,7 +34,7 @@ index 3626dac00..63b2543b2 100644
 +    def UnpairDevice(self, nodeid: int):
 +        self.CheckIsActive()
  
-+        self._ChipStack.Call(
++        self._ChipStack.CallAsync(
 +            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
 +                self.devCtrl, nodeid)
 +        ).raise_on_error()
