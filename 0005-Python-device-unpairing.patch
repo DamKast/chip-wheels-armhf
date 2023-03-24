@@ -1,3 +1,23 @@
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+index a8e2b99d4..82af1bb86 100644
+--- a/.vscode/settings.json
++++ b/.vscode/settings.json
+@@ -168,5 +168,7 @@
+     "files.trimFinalNewlines": true,
+     "C_Cpp.default.cppStandard": "gnu++14",
+     "C_Cpp.default.cStandard": "gnu11",
+-    "cmake.configureOnOpen": false
++    "cmake.configureOnOpen": false,
++    "nrf-connect.topdir": "${nrf-connect.sdk:2.3.0}",
++    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.3.0}"
+ }
+diff --git a/examples/common/m5stack-tft/repo b/examples/common/m5stack-tft/repo
+index 3344a8105..a1ece2c50 160000
+--- a/examples/common/m5stack-tft/repo
++++ b/examples/common/m5stack-tft/repo
+@@ -1 +1 @@
+-Subproject commit 3344a8105f8dfecb95832f369733cf6f863a1662
++Subproject commit a1ece2c500cf179db8f0c7dbc7bb8f3ace562142
 diff --git a/src/controller/CHIPDeviceController.cpp b/src/controller/CHIPDeviceController.cpp
 index f0caac0d7..04e55ca03 100644
 --- a/src/controller/CHIPDeviceController.cpp
@@ -19,7 +39,7 @@ index f0caac0d7..04e55ca03 100644
  {
      if (mDeviceInPASEEstablishment != nullptr)
 diff --git a/src/controller/CHIPDeviceController.h b/src/controller/CHIPDeviceController.h
-index d73950fd1..74c006c35 100644
+index d73950fd1..6845c72e9 100644
 --- a/src/controller/CHIPDeviceController.h
 +++ b/src/controller/CHIPDeviceController.h
 @@ -39,6 +39,7 @@
@@ -36,14 +56,14 @@ index d73950fd1..74c006c35 100644
  
 +    /**
 +     * @brief
-+     * 
++     *    Remove pairing for a paired device. If the device is currently being paired, it'll stop the pairing process.
 +     * @param[in] remoteDeviceId        The remote device Id.
 +     * @param[in] callback              The callback to be called when the device is unpaired.
 +     * 
 +     * 
 +     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
 +    */
-+    CHIP_ERROR UnpairDevice(NodeId remoteDeviceId, Callback::Callback<OnCurrentFabricRemove> * callback);
++    CHIP_ERROR UnpairDevice(NodeId remoteDeviceId, chip::Callback::Callback<OnCurrentFabricRemove> * callback); 
 +
 +
      //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -104,3 +124,101 @@ index 3626dac00..bffe6ffa7 100644
              self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
                  c_void_p, c_uint64]
              self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
+diff --git a/third_party/bouffalolab/repo b/third_party/bouffalolab/repo
+index 890577da8..dc526317d 160000
+--- a/third_party/bouffalolab/repo
++++ b/third_party/bouffalolab/repo
+@@ -1 +1 @@
+-Subproject commit 890577da8b6b1d7f1078382e4e320a1e60cc5f60
++Subproject commit dc526317d2903c4d3a8466226983ce34dc8f23d1
+diff --git a/third_party/mbedtls/repo b/third_party/mbedtls/repo
+index 40d79cef3..8bb9e46c7 160000
+--- a/third_party/mbedtls/repo
++++ b/third_party/mbedtls/repo
+@@ -1 +1 @@
+-Subproject commit 40d79cef351cba835392d42803bb47421f4d8174
++Subproject commit 8bb9e46c7c30251a872f8582a39a30ed6cb0f87c
+diff --git a/third_party/mt793x_sdk/filogic b/third_party/mt793x_sdk/filogic
+index c66bf7346..1201e7af8 160000
+--- a/third_party/mt793x_sdk/filogic
++++ b/third_party/mt793x_sdk/filogic
+@@ -1 +1 @@
+-Subproject commit c66bf7346561529da0d92c2314e661702d800e0c
++Subproject commit 1201e7af8b4a2d32c2b55bb98b76dd212a2e519e
+diff --git a/third_party/mt793x_sdk/lwip b/third_party/mt793x_sdk/lwip
+index 23edc1887..e9c4e9089 160000
+--- a/third_party/mt793x_sdk/lwip
++++ b/third_party/mt793x_sdk/lwip
+@@ -1 +1 @@
+-Subproject commit 23edc18878f11bbf93ec598bf19ede52e7328a4f
++Subproject commit e9c4e9089e0390770795543f33942b247dfeed51
+diff --git a/third_party/mt793x_sdk/mDNSResponder b/third_party/mt793x_sdk/mDNSResponder
+index c366935b3..060b8b575 160000
+--- a/third_party/mt793x_sdk/mDNSResponder
++++ b/third_party/mt793x_sdk/mDNSResponder
+@@ -1 +1 @@
+-Subproject commit c366935b33afbbfb6a4434163005c0b956a4a02d
++Subproject commit 060b8b575976cf4356b8f0c1af801473db92f4c7
+diff --git a/third_party/openthread/ot-nxp b/third_party/openthread/ot-nxp
+index 4c2fa0d3d..24bf5d185 160000
+--- a/third_party/openthread/ot-nxp
++++ b/third_party/openthread/ot-nxp
+@@ -1 +1 @@
+-Subproject commit 4c2fa0d3d29c358fbdc57fa627ed2ba1e76dcdfc
++Subproject commit 24bf5d185d039e89f651310c7f690f3cc72a55ff
+diff --git a/third_party/openthread/repo b/third_party/openthread/repo
+index d2d9aff01..2ce3d3bf0 160000
+--- a/third_party/openthread/repo
++++ b/third_party/openthread/repo
+@@ -1 +1 @@
+-Subproject commit d2d9aff01274663d673c3cdceddeac16c1380a5d
++Subproject commit 2ce3d3bf0218566484be2e9943b95c755cefebe3
+diff --git a/third_party/ot-br-posix/repo b/third_party/ot-br-posix/repo
+index 54170696d..181335224 160000
+--- a/third_party/ot-br-posix/repo
++++ b/third_party/ot-br-posix/repo
+@@ -1 +1 @@
+-Subproject commit 54170696d122bd4901fe0917417bfafe85c36041
++Subproject commit 1813352247aa60fb8993773918f1e5b4af6f3b79
+diff --git a/third_party/pigweed/repo b/third_party/pigweed/repo
+index 71ba37c8a..9235aeb65 160000
+--- a/third_party/pigweed/repo
++++ b/third_party/pigweed/repo
+@@ -1 +1 @@
+-Subproject commit 71ba37c8a6cc65c8084078fb000e8f470cff8597
++Subproject commit 9235aeb653e684a6f0b7b563965d85c747281a0f
+diff --git a/third_party/qpg_sdk/repo b/third_party/qpg_sdk/repo
+index eb198408b..416c31618 160000
+--- a/third_party/qpg_sdk/repo
++++ b/third_party/qpg_sdk/repo
+@@ -1 +1 @@
+-Subproject commit eb198408bc8581702fc0fccd2e05345a1491b558
++Subproject commit 416c31618aedce45f08e53052c90cce2e2f85a9e-dirty
+diff --git a/third_party/silabs/gecko_sdk b/third_party/silabs/gecko_sdk
+index d4854d2ff..3fbadf9fb 160000
+--- a/third_party/silabs/gecko_sdk
++++ b/third_party/silabs/gecko_sdk
+@@ -1 +1 @@
+-Subproject commit d4854d2ff06a828161d7032efb1736d0deda40b1
++Subproject commit 3fbadf9fb4e904fd8ed087642a41762b833ae0fe-dirty
+diff --git a/third_party/silabs/matter_support b/third_party/silabs/matter_support
+index 9d8b890d9..2425fb72c 160000
+--- a/third_party/silabs/matter_support
++++ b/third_party/silabs/matter_support
+@@ -1 +1 @@
+-Subproject commit 9d8b890d978d18157c7e6fbe6e2ee0d5bdae9a11
++Subproject commit 2425fb72cacd540df505f11e7de81e6270ed1c40
+diff --git a/third_party/silabs/wiseconnect-wifi-bt-sdk b/third_party/silabs/wiseconnect-wifi-bt-sdk
+index e314908ec..94a6ce54e 160000
+--- a/third_party/silabs/wiseconnect-wifi-bt-sdk
++++ b/third_party/silabs/wiseconnect-wifi-bt-sdk
+@@ -1 +1 @@
+-Subproject commit e314908eca119784699e8e13c4e5b8ac5ddc3f68
++Subproject commit 94a6ce54e67d11aa1714300fcf85a7505d70b648
+diff --git a/third_party/simw-top-mini/repo b/third_party/simw-top-mini/repo
+index be0dfb64b..aa51a4c0e 160000
+--- a/third_party/simw-top-mini/repo
++++ b/third_party/simw-top-mini/repo
+@@ -1 +1 @@
+-Subproject commit be0dfb64b28dea3509425755e3b4b5b35c38d327
++Subproject commit aa51a4c0e9325761cba47c07b9f3d1d4343f84f1
