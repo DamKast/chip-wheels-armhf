@@ -1,3 +1,54 @@
+diff --git a/src/controller/CHIPDeviceController.cpp b/src/controller/CHIPDeviceController.cpp
+index f0caac0d7..04e55ca03 100644
+--- a/src/controller/CHIPDeviceController.cpp
++++ b/src/controller/CHIPDeviceController.cpp
+@@ -900,6 +900,15 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
+     return AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
+ }
+ 
++CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId, chip::Controller::OnCurrentFabricRemove* callback)
++{
++    MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
++    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
++
++    return CurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId, callback);
++}
++
++
+ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
+ {
+     if (mDeviceInPASEEstablishment != nullptr)
+diff --git a/src/controller/CHIPDeviceController.h b/src/controller/CHIPDeviceController.h
+index d73950fd1..74c006c35 100644
+--- a/src/controller/CHIPDeviceController.h
++++ b/src/controller/CHIPDeviceController.h
+@@ -39,6 +39,7 @@
+ #include <controller/CHIPDeviceControllerSystemState.h>
+ #include <controller/CommissioneeDeviceProxy.h>
+ #include <controller/CommissioningDelegate.h>
++#include <controller/CurrentFabricRemover.h>
+ #include <controller/DevicePairingDelegate.h>
+ #include <controller/OperationalCredentialsDelegate.h>
+ #include <controller/SetUpCodePairer.h>
+@@ -530,6 +531,18 @@ public:
+      */
+     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
+ 
++    /**
++     * @brief
++     * 
++     * @param[in] remoteDeviceId        The remote device Id.
++     * @param[in] callback              The callback to be called when the device is unpaired.
++     * 
++     * 
++     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
++    */
++    CHIP_ERROR UnpairDevice(NodeId remoteDeviceId, Callback::Callback<OnCurrentFabricRemove> * callback);
++
++
+     //////////// SessionEstablishmentDelegate Implementation ///////////////
+     void OnSessionEstablishmentError(CHIP_ERROR error) override;
+     void OnSessionEstablished(const SessionHandle & session) override;
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 index eaced9431..b2cd77408 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
@@ -23,7 +74,7 @@ index eaced9431..b2cd77408 100644
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..818643144 100644
+index 3626dac00..bffe6ffa7 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -385,7 +385,15 @@ class ChipDeviceControllerBase():
@@ -34,10 +85,10 @@ index 3626dac00..818643144 100644
 +    def UnpairDevice(self, nodeid: int):
 +        self.CheckIsActive()
  
-+        return self._ChipStack.Call(
++        return self._ChipStack.CallAsync(
 +            lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
 +                self.devCtrl, nodeid)
-+        )
++        ).raise_on_error()
 +    
      def CloseBLEConnection(self):
          self.CheckIsActive()
