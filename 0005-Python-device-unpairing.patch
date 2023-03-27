@@ -1,5 +1,5 @@
 diff --git a/src/controller/CHIPDeviceController.cpp b/src/controller/CHIPDeviceController.cpp
-index f0caac0d7..69e4cb3dc 100644
+index f0caac0d7..86fe76d3e 100644
 --- a/src/controller/CHIPDeviceController.cpp
 +++ b/src/controller/CHIPDeviceController.cpp
 @@ -900,6 +900,15 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
@@ -11,7 +11,7 @@ index f0caac0d7..69e4cb3dc 100644
 +    MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
 +    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 +
-+    return CurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId, callback);
++    return CurrentFabricRemover::RemoveCurrentFabric(remoteDeviceId, callback);
 +}
 +
 +
