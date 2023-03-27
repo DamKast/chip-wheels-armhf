@@ -19,10 +19,22 @@ index f0caac0d7..04e55ca03 100644
  {
      if (mDeviceInPASEEstablishment != nullptr)
 diff --git a/src/controller/CHIPDeviceController.h b/src/controller/CHIPDeviceController.h
-index d73950fd1..732552c3d 100644
+index d73950fd1..92a590819 100644
 --- a/src/controller/CHIPDeviceController.h
 +++ b/src/controller/CHIPDeviceController.h
-@@ -530,6 +530,18 @@ public:
+@@ -359,6 +359,11 @@ typedef void (*OnExtendFailsafeSuccess)(
+     void * context, const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
+ typedef void (*OnExtendFailsafeFailure)(void * context, CHIP_ERROR error);
+ 
++/**
++ * @brief Callback prototype for Unpair Device command.
++ */
++ typedef void (*OnCurrentFabricRemove)(void * context, NodeId remoteNodeId, CHIP_ERROR status);
++
+ /**
+  * @brief
+  *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
+@@ -530,6 +535,18 @@ public:
       */
      CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
  
