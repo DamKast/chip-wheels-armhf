@@ -1,5 +1,5 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..1a2fc1b3e 100644
+index eaced9431..5311f646d 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -30,7 +30,7 @@ index eaced9431..1a2fc1b3e 100644
 +PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, UnpairDeviceCompleteFunct onComplete)
 +{
 +    // Create a new CurrentFabricRemover instance
-+    auto fabricRemover = new chip::Controller::CurrentFabricRemover(this);
++    auto fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
 +
 +    // Pass the onComplete callback and nodeid to the RemoveCurrentFabric function
 +    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, onComplete);
