@@ -1,5 +1,5 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..87bdec00e 100644
+index eaced9431..259aaddfa 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -26,7 +26,7 @@ index eaced9431..87bdec00e 100644
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -386,6 +389,32 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +389,31 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
@@ -46,13 +46,12 @@ index eaced9431..87bdec00e 100644
 +        // Clean up the callback if an error occurs
 +    if (err != CHIP_NO_ERROR)
 +    {
-+        delete fabricRemover;
-+        return ToPyChipError(err);
++        delete fabricRemover;      
 +    }
 +
 +    // Note: The fabricRemover instance will need to be cleaned up at some point. You could store it in a data structure or use another mechanism to ensure it is properly managed.
-+
-+    return ToPyChipError(fabricRemover->UnpairDevice(nodeid));
++    
++    return ToPyChipError(err);
 +}
 +
 +
