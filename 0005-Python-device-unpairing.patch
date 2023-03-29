@@ -1,5 +1,5 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..8ecc79211 100644
+index eaced9431..3c8de1d7d 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -35,13 +35,13 @@ index eaced9431..8ecc79211 100644
 +    return ToPyChipError(devCtrl->UnpairDevice(nodeid));
 +}
 +
-+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct onComplete)
++PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, Callback::Callback<DeviceUnpairingCompleteFunct> * callback)
 +{
 +    // Create a new CurrentFabricRemover instance
 +    auto fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
 +
-+    // Pass the onComplete callback and nodeid to the RemoveCurrentFabric function
-+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, onComplete);
++    // Pass the callback and nodeid to the RemoveCurrentFabric function
++    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, callback);
 +
 +
 +    // Note: The fabricRemover instance will need to be cleaned up at some point. You could store it in a data structure or use another mechanism to ensure it is properly managed.
