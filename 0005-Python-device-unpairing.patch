@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..b75ba3cad 100644
+index eaced9431..777e97d09 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -45,7 +45,7 @@ index eaced9431..b75ba3cad 100644
 +PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
 +{
 +    // Create a new CurrentFabricRemover instance
-+    auto * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
++    chip::Controller::CurrentFabricRemover * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
 +
 +    auto * callbacks = new UnpairDeviceCallbacks(callback, fabricRemover);
 +
@@ -61,7 +61,7 @@ index eaced9431..b75ba3cad 100644
  PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
-@@ -629,6 +648,25 @@ struct GetDeviceCallbacks
+@@ -629,6 +648,26 @@ struct GetDeviceCallbacks
      Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
      DeviceAvailableFunc mCallback;
  };
@@ -84,6 +84,7 @@ index eaced9431..b75ba3cad 100644
 +    DeviceUnpairingCompleteFunct mCallback;
 +    chip::Controller::CurrentFabricRemover * mRemover;
 +};
++
  } // anonymous namespace
  
  PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
