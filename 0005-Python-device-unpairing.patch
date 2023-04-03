@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..1bc8765db 100644
+index eaced9431..16ad1c1b0 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -75,7 +75,7 @@ index eaced9431..1bc8765db 100644
 +struct UnpairDeviceCallbacks
 +{
 +    UnpairDeviceCallbacks(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover * remover) :
-+        mCallback(callback), mRemover(remover), mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) 
++         mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) , mCallback(callback), mRemover(remover)
 +     {}
 +
 +    static void OnCurrentFabricRemoveFn(void * context, chip::NodeId nodeId, CHIP_ERROR error)
