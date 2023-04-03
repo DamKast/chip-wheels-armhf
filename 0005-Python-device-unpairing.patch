@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..4532ea000 100644
+index eaced9431..d5dc51462 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -45,10 +45,10 @@ index eaced9431..4532ea000 100644
 +PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
 +{
 +    // Create a new CurrentFabricRemover instance
-+    auto fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
++    auto * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
 +
 +    auto * callbacks = new UnpairDeviceCallbacks(callback, fabricRemover);
-+    
++
 +    // Pass the callback and nodeid to the RemoveCurrentFabric function
 +    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
 +
@@ -74,7 +74,7 @@ index eaced9431..4532ea000 100644
 +
 +struct UnpairDeviceCallbacks
 +{
-+    UnpairDeviceCallbacks(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover remover) :
++    UnpairDeviceCallbacks(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover * remover) :
 +        mCallback(callback), mRemover(remover), mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) 
 +     {}
 +
@@ -88,7 +88,7 @@ index eaced9431..4532ea000 100644
 +
 +    Callback::Callback<OnCurrentFabricRemove> mOnCurrentFabricRemove;
 +    DeviceUnpairingCompleteFunct mCallback;
-+    chip::Controller::CurrentFabricRemover mRemover;
++    chip::Controller::CurrentFabricRemover * mRemover;
 +};
  } // anonymous namespace
  
