@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..16ad1c1b0 100644
+index eaced9431..b75ba3cad 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -38,7 +38,7 @@ index eaced9431..16ad1c1b0 100644
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -386,6 +389,28 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +389,22 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
@@ -52,12 +52,6 @@ index eaced9431..16ad1c1b0 100644
 +    // Pass the callback and nodeid to the RemoveCurrentFabric function
 +    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
 +
-+    // Clean up the callback and fabricRemover object if an error occurs
-+    if (err != CHIP_NO_ERROR)
-+    {
-+        delete fabricRemover; 
-+        delete callbacks;     
-+    }
 +
 +    ChipLogError(Controller, "Sent out Unpair command with no issues...");
 +    return ToPyChipError(err);
@@ -67,7 +61,7 @@ index eaced9431..16ad1c1b0 100644
  PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
-@@ -629,6 +654,25 @@ struct GetDeviceCallbacks
+@@ -629,6 +648,25 @@ struct GetDeviceCallbacks
      Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
      DeviceAvailableFunc mCallback;
  };
