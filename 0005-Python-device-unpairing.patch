@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..a4c2df7d3 100644
+index eaced9431..4532ea000 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -26,7 +26,7 @@ index eaced9431..a4c2df7d3 100644
  typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
  typedef void (*DeviceAvailableFunc)(DeviceProxy * device, PyChipError err);
  typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
-+typedef void (*DeviceUnpairingCompleteFunct)(void * context, uint64_t nodeId, CHIP_ERROR error);
++typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, CHIP_ERROR error);
  }
  
  namespace {
@@ -34,34 +34,31 @@ index eaced9431..a4c2df7d3 100644
                                                uint32_t setupPINCode, chip::NodeId nodeid);
  PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                      chip::NodeId nodeid);
-+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId, Callback::Callback<DeviceUnpairingCompleteFunct> * callback);
++PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId, DeviceUnpairingCompleteFunct callback);
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -386,6 +389,31 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +389,28 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
-+// PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
-+// {
-+//     return ToPyChipError(devCtrl->UnpairDevice(nodeid));
-+// }
-+
-+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, Callback::Callback<DeviceUnpairingCompleteFunct> * callback)
++PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
 +{
 +    // Create a new CurrentFabricRemover instance
 +    auto fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
 +
++    auto * callbacks = new UnpairDeviceCallbacks(callback, fabricRemover);
++    
 +    // Pass the callback and nodeid to the RemoveCurrentFabric function
-+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, callback);
++    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
 +
-+        // Clean up the callback if an error occurs
++    // Clean up the callback and fabricRemover object if an error occurs
 +    if (err != CHIP_NO_ERROR)
 +    {
-+        delete fabricRemover;      
++        delete fabricRemover; 
++        delete callbacks;     
 +    }
 +
-+    // Note: The fabricRemover instance will need to be cleaned up at some point. You could store it in a data structure or use another mechanism to ensure it is properly managed.
 +    ChipLogError(Controller, "Sent out Unpair command with no issues...");
 +    return ToPyChipError(err);
 +}
@@ -70,15 +67,41 @@ index eaced9431..a4c2df7d3 100644
  PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
+@@ -629,6 +654,25 @@ struct GetDeviceCallbacks
+     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
+     DeviceAvailableFunc mCallback;
+ };
++
++struct UnpairDeviceCallbacks
++{
++    UnpairDeviceCallbacks(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover remover) :
++        mCallback(callback), mRemover(remover), mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) 
++     {}
++
++    static void OnCurrentFabricRemoveFn(void * context, chip::NodeId nodeId, CHIP_ERROR error)
++    {
++        auto * self = static_cast<UnpairDeviceCallbacks *>(context);
++        self->mCallback(nodeId, ToPyChipError(error));
++        delete self->mRemover;
++        delete self;
++    }
++
++    Callback::Callback<OnCurrentFabricRemove> mOnCurrentFabricRemove;
++    DeviceUnpairingCompleteFunct mCallback;
++    chip::Controller::CurrentFabricRemover mRemover;
++};
+ } // anonymous namespace
+ 
+ PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 3626dac00..2f5b615be 100644
+index 3626dac00..13eb8011f 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
 @@ -60,6 +60,7 @@ from .native import PyChipError
  __all__ = ["ChipDeviceController"]
  
  _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
-+_DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_void_p, c_uint64, PyChipError)
++_DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
  _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
      None, c_uint64, PyChipError)
  _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
@@ -86,7 +109,7 @@ index 3626dac00..2f5b615be 100644
              self._ChipStack.callbackRes = err
              self._ChipStack.completeEvent.set()
  
-+        def HandleUnpairDeviceComplete(context, nodeid: int, err: PyChipError):
++        def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
 +            print("are we here?")
 +            if err.is_success:
 +                print("Succesfully unpaired device with nodeid {}".format(nodeid))
