@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..777e97d09 100644
+index eaced9431..0af82d878 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -38,35 +38,12 @@ index eaced9431..777e97d09 100644
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -386,6 +389,22 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +389,43 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
-+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
-+{
-+    // Create a new CurrentFabricRemover instance
-+    chip::Controller::CurrentFabricRemover * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
-+
-+    auto * callbacks = new UnpairDeviceCallbacks(callback, fabricRemover);
-+
-+    // Pass the callback and nodeid to the RemoveCurrentFabric function
-+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
-+
-+
-+    ChipLogError(Controller, "Sent out Unpair command with no issues...");
-+    return ToPyChipError(err);
-+}
-+
-+
- PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
-                                                         uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
- {
-@@ -629,6 +648,26 @@ struct GetDeviceCallbacks
-     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-     DeviceAvailableFunc mCallback;
- };
-+
-+struct UnpairDeviceCallbacks
++namespace {
++    struct UnpairDeviceCallbacks
 +{
 +    UnpairDeviceCallbacks(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover * remover) :
 +         mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) , mCallback(callback), mRemover(remover)
@@ -84,10 +61,27 @@ index eaced9431..777e97d09 100644
 +    DeviceUnpairingCompleteFunct mCallback;
 +    chip::Controller::CurrentFabricRemover * mRemover;
 +};
++} // anonymous namespace
 +
- } // anonymous namespace
- 
- PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
++PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
++{
++    // Create a new CurrentFabricRemover instance
++    auto * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
++
++    auto * callbacks = new UnpairDeviceCallbacks(callback, fabricRemover);
++
++    // Pass the callback and nodeid to the RemoveCurrentFabric function
++    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
++
++
++    ChipLogError(Controller, "Sent out Unpair command with no issues...");
++    return ToPyChipError(err);
++}
++
++
+ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
+                                                         uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
+ {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
 index 3626dac00..13eb8011f 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
