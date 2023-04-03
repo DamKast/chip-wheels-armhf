@@ -11,7 +11,7 @@ index 805504cb3..80a573f9a 100644
      }
  }
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index eaced9431..d5dc51462 100644
+index eaced9431..1bc8765db 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -26,7 +26,7 @@ index eaced9431..d5dc51462 100644
  typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
  typedef void (*DeviceAvailableFunc)(DeviceProxy * device, PyChipError err);
  typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
-+typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, CHIP_ERROR error);
++typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, PyChipError error);
  }
  
  namespace {
