@@ -101,6 +101,7 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
             - name: Run Python library specific unit tests
               run: |
+                    scripts/run_in_build_env.sh 'ls ./out/controller/python/'
                     scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-${{ needs.build_prepare.outputs.version }}-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
                     scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
                     scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
