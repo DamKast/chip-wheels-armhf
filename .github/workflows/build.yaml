@@ -88,6 +88,7 @@ jobs:
                   patch -p1 < ../0003-Use-data-as-platform-storage-location.patch
                   patch -p1 < ../0004-Support-device-unpairing.patch
                   patch -p1 < ../0005-Python-device-unpairing.patch
+                  patch -p1 < ../0006-Python-debug-device-discovery.patch
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build, Run Build and Run Tests
