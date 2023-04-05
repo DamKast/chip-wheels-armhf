@@ -95,7 +95,7 @@ jobs:
                                                   chip_config_memory_debug_checks=false \
                                                   chip_config_memory_debug_dmalloc=false \
                                                   chip_mdns=\"minimal\" \
-                                                  chip_python_version=\"devtest"  \
+                                                  chip_python_version=\"devtest\"  \
                                                   chip_python_package_prefix=\"chip\" \
                                                   "
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
