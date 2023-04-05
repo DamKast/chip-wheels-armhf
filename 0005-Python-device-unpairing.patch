@@ -59,7 +59,7 @@ index eaced9431..0f6050885 100644
 +    auto * callbacks = new UnpairDeviceCallback(callback, fabricRemover);
 +
 +    // Pass the callback and nodeid to the RemoveCurrentFabric function
-+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
++    fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
 +
 +    return ToPyChipError(CHIP_NO_ERROR);
 +}
