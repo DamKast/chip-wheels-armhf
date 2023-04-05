@@ -1,8 +1,8 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index 46b9f0b878..7e2f552c92 100644
+index 8115266991..67e0f199ee 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-@@ -446,23 +446,28 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
+@@ -397,23 +397,28 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
              return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
          }
          filter.code = static_cast<uint64_t>(numericalArg);
@@ -19,15 +19,15 @@ index 46b9f0b878..7e2f552c92 100644
      case chip::Dnssd::DiscoveryFilterType::kInstanceName:
          filter.code         = 0;
          filter.instanceName = filterParam;
-+        ChipLogError(Controller, "exit 3");
++        ChipLogError(Controller, "exit 4");
          break;
      default:
          return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
      }
 -
-+    ChipLogError(Controller, "init device discovery delegate");
++    ChipLogError(Controller, "init discovery delegate");
      sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
      devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
-+    ChipLogError(Controller, "we now try and discover nodes..");
++    ChipLogError(Controller, "discovering node");
      return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
  }
