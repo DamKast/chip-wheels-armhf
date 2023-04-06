@@ -1,5 +1,5 @@
 diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
-index 8115266991..babc256024 100644
+index eaced9431..0f6050885 100644
 --- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
 @@ -48,6 +48,7 @@
@@ -10,7 +10,7 @@ index 8115266991..babc256024 100644
  #include <controller/ExampleOperationalCredentialsIssuer.h>
  
  #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
-@@ -88,6 +89,7 @@ typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataL
+@@ -89,6 +90,7 @@ typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataL
  typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
  typedef void (*DeviceAvailableFunc)(DeviceProxy * device, PyChipError err);
  typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
@@ -18,7 +18,7 @@ index 8115266991..babc256024 100644
  }
  
  namespace {
-@@ -129,6 +131,7 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
+@@ -131,6 +133,7 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
                                                uint32_t setupPINCode, chip::NodeId nodeid);
  PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                      chip::NodeId nodeid);
@@ -26,7 +26,7 @@ index 8115266991..babc256024 100644
  PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
  PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
  PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
-@@ -376,6 +379,48 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
+@@ -386,6 +389,41 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
      return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
  }
  
@@ -59,16 +59,9 @@ index 8115266991..babc256024 100644
 +    auto * callbacks = new UnpairDeviceCallback(callback, fabricRemover);
 +
 +    // Pass the callback and nodeid to the RemoveCurrentFabric function
-+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
++    fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
 +
-+    if (err != CHIP_NO_ERROR)
-+    {
-+        delete fabricRemover;
-+        delete callbacks;
-+    }
-+    
-+    // Else will clean up when the callback is called.
-+    return ToPyChipError(err);
++    return ToPyChipError(CHIP_NO_ERROR);
 +}
 +
 +
@@ -76,19 +69,19 @@ index 8115266991..babc256024 100644
                                                          uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
  {
 diff --git a/src/controller/python/chip/ChipDeviceCtrl.py b/src/controller/python/chip/ChipDeviceCtrl.py
-index 5a66aab122..4f5a5c8334 100644
+index 3626dac00..a1c8de885 100644
 --- a/src/controller/python/chip/ChipDeviceCtrl.py
 +++ b/src/controller/python/chip/ChipDeviceCtrl.py
-@@ -56,6 +56,7 @@ import dacite
+@@ -60,6 +60,7 @@ from .native import PyChipError
  __all__ = ["ChipDeviceController"]
  
  _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, PyChipError)
 +_DeviceUnpairingCompleteFunct = CFUNCTYPE(None, c_uint64, PyChipError)
  _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
      None, c_uint64, PyChipError)
- _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
-@@ -254,6 +255,15 @@ class ChipDeviceController():
-             self._ChipStack.commissioningCompleteEvent.set()
+ _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
+@@ -248,6 +249,15 @@ class ChipDeviceControllerBase():
+             self._ChipStack.callbackRes = err
              self._ChipStack.completeEvent.set()
  
 +        def HandleUnpairDeviceComplete(nodeid: int, err: PyChipError):
@@ -101,9 +94,9 @@ index 5a66aab122..4f5a5c8334 100644
 +            self._ChipStack.completeEvent.set()
 +
          def HandlePASEEstablishmentComplete(err: PyChipError):
-             if err.is_success:
+             if not err.is_success:
                  print("Failed to establish secure session to device: {}".format(err))
-@@ -285,7 +295,7 @@ class ChipDeviceController():
+@@ -286,7 +296,7 @@ class ChipDeviceControllerBase():
  
          self.state = DCState.IDLE
          self._isActive = True
@@ -111,8 +104,8 @@ index 5a66aab122..4f5a5c8334 100644
 +        self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
          # Validate FabricID/NodeID followed from NOC Chain
          self._fabricId = self.GetFabricIdInternal()
-         assert self._fabricId == fabricId
-@@ -386,7 +396,15 @@ class ChipDeviceController():
+         self._nodeId = self.GetNodeIdInternal()
+@@ -385,7 +395,15 @@ class ChipDeviceControllerBase():
              # Error 50 is a timeout
              return False
          return self._ChipStack.commissioningEventRes.is_success
@@ -128,7 +121,7 @@ index 5a66aab122..4f5a5c8334 100644
      def CloseBLEConnection(self):
          self.CheckIsActive()
  
-@@ -1345,6 +1363,10 @@ class ChipDeviceController():
+@@ -1274,6 +1292,10 @@ class ChipDeviceControllerBase():
                  c_void_p, c_char_p, c_uint64]
              self._dmLib.pychip_DeviceController_ConnectWithCode.restype = PyChipError
  
