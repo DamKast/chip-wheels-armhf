@@ -32,17 +32,15 @@ index 8115266991..67e0f199ee 100644
      return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
  }
  diff --git a/src/controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp b/src/controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp
-index 1752232b78..fe9b71e3e2 100644
+index 1752232b78..67d4c2008a 100644
 --- a/src/controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp
 +++ b/src/controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.cpp
-@@ -24,8 +24,8 @@ namespace Controller {
+@@ -24,7 +24,7 @@ namespace Controller {
  void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
  {
      // Ignore nodes with closed comissioning window
 -    VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
--    VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
-+    // VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
-+    // VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
++    //VerifyOrReturn(nodeData.commissionData.commissioningMode != 0);
+     VerifyOrReturn(mActiveDeviceCommissioner != nullptr);
  
      const uint16_t port = nodeData.resolutionData.port;
-     char buf[chip::Inet::IPAddress::kMaxStringLength];
