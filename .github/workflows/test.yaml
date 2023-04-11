@@ -86,6 +86,7 @@ jobs:
                   patch -p1 < ../0004-Support-device-unpairing.patch
                   patch -p1 < ../0005-Python-device-unpairing.patch
                   patch -p1 < ../0006-Python-debug-device-discovery.patch
+                  patch -p1 < ../0007-Add-lookup-dicts-for-clusters-and-attributes.patch
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build, Run Build and Run Tests
