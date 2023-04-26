@@ -19,9 +19,9 @@ index 69d028925..af1019350 100644
  
  static_library("Linux") {
 +  defines = [
-+    "FATCONFDIR=\"/data\"",
-+    "SYSCONFDIR=\"/data\"",
-+    "LOCALSTATEDIR=\"/data\"",
++    "FATCONFDIR=\"/home/pi/.matter_server\"",
++    "SYSCONFDIR=\"/home/pi/.matter_server\"",
++    "LOCALSTATEDIR=\"/home/pi/.matter_server\"",
 +  ]
 +
    sources = [
