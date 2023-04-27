@@ -85,7 +85,7 @@ jobs:
               run: |
                   patch -p1 < ../0001-Support-custom-platform-tag.patch
                   patch -p1 < ../0002-Revert-Python-dependencies.patch
-                  patch -p1 < ../0003-Use-data-as-platform-storage-location.patch
+                  patch -p1 < ../0003-Edit-Linux-platform-storage-location.patch
                   patch -p1 < ../0004-Support-device-unpairing.patch
                   patch -p1 < ../0005-Python-device-unpairing.patch
                   patch -p1 < ../0006-Python-debug-device-discovery.patch
