@@ -54,6 +54,26 @@ index 675e7ac238..2987184e84 100644
          ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
          Platform::CopyString(service.mType, kCommissionableServiceName);
          service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+diff --git a/src/lib/dnssd/Resolver_ImplMinimalMdns.cpp b/src/lib/dnssd/Resolver_ImplMinimalMdns.cpp
+index c8032cb4e6..67a1eb80e6 100644
+--- a/src/lib/dnssd/Resolver_ImplMinimalMdns.cpp
++++ b/src/lib/dnssd/Resolver_ImplMinimalMdns.cpp
+@@ -634,6 +634,7 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
+ 
+ CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter)
+ {
++    ChipLogError(Discovery, "Hamid: in the ResolverProxy MinMdnsResolver implementation");
+     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
+ }
+ 
+@@ -729,6 +730,7 @@ void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
+ 
+ CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
+ {
++    ChipLogError(Discovery, "Hamid: in the ResolverProxy implementation");
+     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
+     return chip::Dnssd::Resolver::Instance().DiscoverCommissionableNodes(filter);
 diff --git a/src/platform/Linux/DnssdImpl.cpp b/src/platform/Linux/DnssdImpl.cpp
 index eac8003e40..e66974bda0 100644
 --- a/src/platform/Linux/DnssdImpl.cpp
