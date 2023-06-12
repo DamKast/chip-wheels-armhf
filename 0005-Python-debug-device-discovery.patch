@@ -1,0 +1,61 @@
+diff --git a/src/controller/CHIPDeviceController.cpp b/src/controller/CHIPDeviceController.cpp
+index 2ae83b3208..18f9f48d9a 100644
+--- a/src/controller/CHIPDeviceController.cpp
++++ b/src/controller/CHIPDeviceController.cpp
+@@ -1526,6 +1526,7 @@ void DeviceCommissioner::CloseBleConnection()
+ CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
+ {
+     ReturnErrorOnFailure(SetUpNodeDiscovery());
++    ChipLogError(Controller, "Hamid: Firing  mDNSResolver.DiscoverCommissionableNodes");
+     return mDNSResolver.DiscoverCommissionableNodes(filter);
+ }
+ 
+diff --git a/src/controller/python/ChipDeviceController-ScriptBinding.cpp b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
+index 5b2b3a0175..e10eb96fa4 100644
+--- a/src/controller/python/ChipDeviceController-ScriptBinding.cpp
++++ b/src/controller/python/ChipDeviceController-ScriptBinding.cpp
+@@ -468,6 +468,7 @@ PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::Device
+ 
+     sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, &sPairingDelegate, devCtrl);
+     devCtrl->RegisterDeviceDiscoveryDelegate(&sPairingDeviceDiscoveryDelegate);
++    ChipLogError(Controller, "Hamid: Firing DiscoverCommissionableNodes");
+     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
+ }
+ 
+diff --git a/src/lib/dnssd/Discovery_ImplPlatform.cpp b/src/lib/dnssd/Discovery_ImplPlatform.cpp
+index 675e7ac238..17d5e54524 100644
+--- a/src/lib/dnssd/Discovery_ImplPlatform.cpp
++++ b/src/lib/dnssd/Discovery_ImplPlatform.cpp
+@@ -628,6 +628,7 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
+ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
+ {
+     ReturnErrorOnFailure(InitImpl());
++    ChipLogError(Discovery, "Hamid: Now we are base, firing DiscoverCommissionableNodes");
+     return mResolverProxy.DiscoverCommissionableNodes(filter);
+ }
+ 
+@@ -709,10 +710,11 @@ CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
+     mDelegate->Retain();
+ 
+     if (filter.type == DiscoveryFilterType::kInstanceName)
++    ChipLogError(Discovery, "Hamid: i think this is the problem area");
+     {
+         // when we have the instance name, no need to browse, only need to resolve
+         DnssdService service;
+-
++        ChipLogError(Discovery, "Hamid: We do not do the browse step.");
+         ReturnErrorOnFailure(MakeServiceSubtype(service.mName, sizeof(service.mName), filter));
+         Platform::CopyString(service.mType, kCommissionableServiceName);
+         service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolUdp;
+diff --git a/src/platform/Linux/DnssdImpl.cpp b/src/platform/Linux/DnssdImpl.cpp
+index eac8003e40..e66974bda0 100644
+--- a/src/platform/Linux/DnssdImpl.cpp
++++ b/src/platform/Linux/DnssdImpl.cpp
+@@ -853,6 +853,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
+                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                            intptr_t * browseIdentifier)
+ {
++     ChipLogError(DeviceLayer, "Hamid: We are firing BROWSE");
+     *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+     return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+ }
