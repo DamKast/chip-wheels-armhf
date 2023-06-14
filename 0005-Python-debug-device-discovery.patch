@@ -22,6 +22,19 @@ index 5b2b3a0175..e10eb96fa4 100644
      return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
  }
  
+diff --git a/src/lib/dnssd/BUILD.gn b/src/lib/dnssd/BUILD.gn
+index b33b304f19..54c6955965 100644
+--- a/src/lib/dnssd/BUILD.gn
++++ b/src/lib/dnssd/BUILD.gn
+@@ -40,6 +40,8 @@ static_library("dnssd") {
+     "TxtFields.h",
+   ]
+ 
++  chip_mdns = "platform"
++
+   if (chip_mdns == "none") {
+     sources += [
+       "Advertiser_ImplNone.cpp",
 diff --git a/src/lib/dnssd/Discovery_ImplPlatform.cpp b/src/lib/dnssd/Discovery_ImplPlatform.cpp
 index 675e7ac238..2987184e84 100644
 --- a/src/lib/dnssd/Discovery_ImplPlatform.cpp
