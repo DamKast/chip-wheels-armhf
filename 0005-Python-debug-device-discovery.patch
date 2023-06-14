@@ -22,19 +22,6 @@ index 5b2b3a0175..e10eb96fa4 100644
      return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
  }
  
-diff --git a/src/lib/dnssd/BUILD.gn b/src/lib/dnssd/BUILD.gn
-index b33b304f19..54c6955965 100644
---- a/src/lib/dnssd/BUILD.gn
-+++ b/src/lib/dnssd/BUILD.gn
-@@ -40,6 +40,8 @@ static_library("dnssd") {
-     "TxtFields.h",
-   ]
- 
-+  chip_mdns = "platform"
-+
-   if (chip_mdns == "none") {
-     sources += [
-       "Advertiser_ImplNone.cpp",
 diff --git a/src/lib/dnssd/Discovery_ImplPlatform.cpp b/src/lib/dnssd/Discovery_ImplPlatform.cpp
 index 675e7ac238..2987184e84 100644
 --- a/src/lib/dnssd/Discovery_ImplPlatform.cpp
@@ -107,65 +94,3 @@ index eac8003e40..e66974bda0 100644
      *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
      return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
  }
-diff --git a/src/platform/device.gni b/src/platform/device.gni
-index 77ca207ebb..6c6ddd14fc 100755
---- a/src/platform/device.gni
-+++ b/src/platform/device.gni
-@@ -81,22 +81,24 @@ declare_args() {
-   chip_enable_ota_requestor = false
- 
-   # Select DNS-SD implementation
--  if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
--      chip_device_platform == "mbed" || chip_device_platform == "psoc6" ||
--      chip_device_platform == "ameba" || chip_device_platform == "webos" ||
--      chip_device_platform == "cc32xx" || chip_device_platform == "bl602" ||
--      chip_device_platform == "mw320" || chip_device_platform == "beken" ||
--      chip_device_platform == "mt793x" ||
--      chip_device_platform == "openiotsdk") {
--    chip_mdns = "minimal"
--  } else if (chip_device_platform == "darwin" ||
--             chip_device_platform == "cc13x2_26x2" || current_os == "android" ||
--             chip_device_platform == "fake" ||
--             chip_device_platform == "tizen") {
--    chip_mdns = "platform"
--  } else {
--    chip_mdns = "none"
--  }
-+  chip_mdns = "platform"
-+
-+  # if (chip_device_platform == "esp32" || chip_device_platform == "mbed" ||
-+  #     chip_device_platform == "psoc6" || chip_device_platform == "ameba" ||
-+  #     chip_device_platform == "webos" || chip_device_platform == "cc32xx" ||
-+  #     chip_device_platform == "bl602" || chip_device_platform == "mw320" ||
-+  #     chip_device_platform == "beken" || chip_device_platform == "mt793x" ||
-+  #     chip_device_platform == "openiotsdk") {
-+  #   chip_mdns = "minimal"
-+  # } else if (chip_device_platform == "darwin" ||
-+  #            chip_device_platform == "linux" ||
-+  #            chip_device_platform == "cc13x2_26x2" || current_os == "android" ||
-+  #            chip_device_platform == "fake" ||
-+  #            chip_device_platform == "tizen") {
-+  #   chip_mdns = "platform"
-+  # } else {
-+  #   chip_mdns = "none"
-+  # }
- 
-   # Enable Subscription persistence / resumption for CI and supported platforms
-   if (chip_device_platform == "darwin" || chip_device_platform == "linux" ||
-@@ -107,11 +109,11 @@ declare_args() {
-   }
- }
- 
--if (chip_device_platform == "bl702" && chip_enable_openthread) {
--  chip_mdns = "platform"
--} else if (chip_device_platform == "bl702" && chip_enable_wifi) {
--  chip_mdns = "minimal"
--}
-+# if (chip_device_platform == "bl702" && chip_enable_openthread) {
-+#   chip_mdns = "platform"
-+# } else if (chip_device_platform == "bl702" && chip_enable_wifi) {
-+#   chip_mdns = "minimal"
-+# }
- 
- _chip_device_layer = "none"
- if (chip_device_platform == "cc13x2_26x2") {
