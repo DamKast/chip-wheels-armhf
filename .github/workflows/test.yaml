@@ -130,14 +130,14 @@ jobs:
                                                   chip_config_memory_debug_checks=false \
                                                   chip_config_memory_debug_dmalloc=false \
                                                   chip_mdns=\"platform\" \
-                                                  chip_python_version=\"devtest\"  \
+                                                  chip_python_version=\"${{ needs.build_prepare.outputs.version }}\"  \
                                                   chip_python_package_prefix=\"chip\" \
                                                   chip_code_pre_generated_directory=\"$(pwd)/zzz_pregenerated\" \
                                                   "
                   scripts/run_in_build_env.sh "ninja -C ./out chip-repl"
             - name: Run Python library specific unit tests
               run: |
-                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-devtest-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
-                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-devtest-py3-none-any.whl'
-                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-devtest-py3-none-any.whl'
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-${{ needs.build_prepare.outputs.version }}-cp37-abi3-linux_${{ matrix.arch.name }}.whl'
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
+                    scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-${{ needs.build_prepare.outputs.version }}-py3-none-any.whl'
                     scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
