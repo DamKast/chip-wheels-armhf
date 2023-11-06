@@ -86,9 +86,9 @@ jobs:
         strategy:
             matrix:
                 arch:
-                    - name: armv7l
-                      container: damienkastner/chip-build-crosscompile-armhf:0.6.25
-                      runner: ubuntu-latest
+                    - name: x86_64
+                      container: connectedhomeip/chip-build:0.6.18
+                      runner: ubuntu-22.04
 
         runs-on: ${{ matrix.arch.runner }}
         defaults:
@@ -122,9 +122,6 @@ jobs:
             - name: Setup Build, Run Build and Run Tests
               run: |
                   scripts/build/gn_gen.sh --args=" \
-                                                  target_os=\"linux\" \
-                                                  target_cpu=\"arm\" \
-                                                  sysroot=\"/opt/raspberry-buster-armhf-sysroot\" \
                                                   enable_rtti=true \
                                                   enable_pylib=true \
                                                   chip_config_memory_debug_checks=false \
