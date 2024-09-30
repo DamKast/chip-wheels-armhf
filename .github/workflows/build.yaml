@@ -129,7 +129,7 @@ jobs:
                                                   target_cpu=\"arm\" \
                                                   sysroot=\"/opt/raspberry-buster-armhf-sysroot\" \
                                                   enable_rtti=true \
-                                                  enable_pylib=true \
+                                                  chip_crypto=\"boringssl\" \
                                                   chip_config_memory_debug_checks=false \
                                                   chip_config_memory_debug_dmalloc=false \
                                                   chip_mdns=\"platform\" \
