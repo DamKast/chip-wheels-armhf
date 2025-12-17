@@ -123,8 +123,7 @@ jobs:
           chip_enable_ble=true \
           treat_warnings_as_errors=false \
           chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
-          chip_python_package_prefix=\"chip\" \
-        "
+          chip_python_package_prefix=\"chip\""
 
       - name: Build Python controller (chip-core)
         working-directory: project-chip
