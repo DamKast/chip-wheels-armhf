@@ -82,10 +82,11 @@ jobs:
 
       - name: Package Matter SDK
         run: |
-          tar -caf connectedhomeip.tar.zst \
+          tar -caf ../connectedhomeip.tar.zst \
             --exclude ./connectedhomeip/.environment \
             --use-compress-program=zstdmt \
             .
+          mv ../connectedhomeip.tar.zst ./connectedhomeip.tar.zst
 
       - name: Upload Matter SDK artifact
         uses: actions/upload-artifact@v4
