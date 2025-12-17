@@ -10,9 +10,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-env:
-  MATTER_SDK_REF: v1.4.0.0  # Consider updating to a newer version
-
 jobs:
   build_prepare:
     name: Prepare Matter SDK
@@ -23,6 +20,7 @@ jobs:
       - name: Checkout build repository
         uses: actions/checkout@v4
         with:
+          submodules: true
           fetch-depth: 0
 
       - name: Determine version
@@ -48,13 +46,6 @@ jobs:
           
           echo "Building version: $version"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout Matter SDK
-        uses: actions/checkout@v4
-        with:
-          repository: project-chip/connectedhomeip
-          ref: ${{ env.MATTER_SDK_REF }}
-          path: connectedhomeip
 
       - name: Checkout submodules
         working-directory: connectedhomeip
