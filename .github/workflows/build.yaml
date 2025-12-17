@@ -1,14 +1,17 @@
-name: CHIP wheels build
+name: CHIP wheels build (ARMv7)
 
-on: push
+on:
+  push:
+  workflow_dispatch:
 
 env:
-  matter_sdk_ref: v1.3.0.0
+  MATTER_SDK_REF: v1.3.0.0
 
 jobs:
   build_prepare:
     name: Prepare Matter SDK
     runs-on: ubuntu-22.04
+
     outputs:
       version: ${{ steps.version.outputs.version }}
 
@@ -18,38 +21,45 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get version
+      - name: Determine version
         id: version
         shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git zstd
-          version=$(echo "${{ github.ref }}" | awk -F"/" '{print $NF}')
-          if [[ "${version}" =~ ^refs/heads/ ]]; then
-            today="$(date --utc '+%Y.%m.%d')"
-            version="${today}.dev"
+          version=$(echo "${GITHUB_REF_NAME}")
+          if [[ "$version" == "main" || "$version" == "dev" ]]; then
+            date="$(date --utc '+%Y.%m.dev.%d')"
+            count="$(git rev-list --count HEAD)"
+            version="${date}.${count}"
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Building version: $version"
 
       - name: Checkout Matter SDK
         uses: actions/checkout@v4
         with:
           repository: project-chip/connectedhomeip
-          ref: ${{ env.matter_sdk_ref }}
-          path: project-chip
+          ref: ${{ env.MATTER_SDK_REF }}
+          path: connectedhomeip
 
       - name: Checkout submodules
-        working-directory: project-chip
-        run: scripts/checkout_submodules.py --shallow --platform linux
-
-      - name: Bootstrap SDK
-        working-directory: project-chip
-        run: bash scripts/bootstrap.sh -p all,linux
-
-      - name: Create Matter SDK archive
-        working-directory: project-chip
+        working-directory: connectedhomeip
         run: |
-          tar -caf ../project-chip.tar.zst \
+          scripts/checkout_submodules.py --shallow --platform linux
+
+      - name: Bootstrap Matter SDK
+        working-directory: connectedhomeip
+        run: |
+          bash scripts/bootstrap.sh -p all,linux
+
+      - name: ZAP pre-generation
+        working-directory: connectedhomeip
+        run: |
+          scripts/run_in_build_env.sh "scripts/codepregen.py ./zzz_pregenerated"
+
+      - name: Package Matter SDK
+        working-directory: connectedhomeip
+        run: |
+          tar -caf ../connectedhomeip.tar.zst \
             --exclude .environment \
             --use-compress-program=zstdmt .
 
@@ -57,38 +67,43 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: matter-sdk-${{ github.run_id }}
-          path: project-chip.tar.zst
-          overwrite: true
+          path: connectedhomeip.tar.zst
+
 
   build_linux_armv7_python_lib:
-    name: Build Python wheels for Linux (armv7l)
+    name: Build Python wheels (ARMv7)
     needs: build_prepare
     runs-on: ubuntu-latest
 
     container:
       image: damienkastner/chip-build-crosscompile-armhf:0.6.25
-      options: --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
-    defaults:
-      run:
-        working-directory: project-chip
+      options: >-
+        --sysctl net.ipv6.conf.all.disable_ipv6=0
+        --sysctl net.ipv4.conf.all.forwarding=1
+        --sysctl net.ipv6.conf.all.forwarding=1
 
     steps:
-      - name: Download Matter SDK artifact
+      - name: Download Matter SDK
         uses: actions/download-artifact@v4
         with:
           name: matter-sdk-${{ github.run_id }}
 
       - name: Extract Matter SDK
         run: |
-          rm -rf project-chip
-          tar -xaf project-chip.tar.zst --use-compress-program=zstdmt .
+          rm -rf connectedhomeip
+          mkdir connectedhomeip
+          tar -xaf connectedhomeip.tar.zst \
+            --use-compress-program=zstdmt \
+            -C connectedhomeip
           git config --global --add safe.directory "*"
 
-      - name: Bootstrap (build environment)
-        run: bash scripts/bootstrap.sh -p all,linux
+      - name: Bootstrap (container)
+        working-directory: connectedhomeip
+        run: |
+          bash scripts/bootstrap.sh -p all,linux
 
       - name: Generate GN build
+        working-directory: connectedhomeip
         run: |
           scripts/build/gn_gen.sh --args=" \
             target_os=\"linux\" \
@@ -103,21 +118,16 @@ jobs:
             chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
             chip_python_package_prefix=\"chip\" \
             chip_python_platform_tag=\"manylinux2014_armv7l\" \
+            chip_code_pre_generated_directory=\"$(pwd)/zzz_pregenerated\" \
           "
 
       - name: Build Matter Python wheels
+        working-directory: connectedhomeip
         run: |
           scripts/run_in_build_env.sh "ninja -C out matter-repl"
 
-      - name: Upload wheels artifact
+      - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: chip-wheels-linux-armv7l
-          path: project-chip/out/controller/python/*.whl
-          overwrite: true
-
-      - name: Upload wheels to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          files: project-chip/out/controller/python/*.whl
+          path: connectedhomeip/out/controller/python/*.whl
