@@ -63,14 +63,11 @@ jobs:
       - name: Apply patches
         working-directory: connectedhomeip
         run: |
-          if ls ../*.patch 1> /dev/null 2>&1; then
-            for patch in ../*.patch; do
+          for patch in ../*.patch
+          do
               echo "Applying ${patch}"
-              patch -p1 < "$patch"
-            done
-          else
-            echo "No patches to apply"
-          fi
+              patch -p1 < $patch
+          done
 
       - name: Bootstrap Matter SDK
         working-directory: connectedhomeip
