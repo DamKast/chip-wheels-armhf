@@ -113,17 +113,18 @@ jobs:
       - name: Generate GN build
         working-directory: project-chip
         run: |
-          scripts/build/gn_gen.sh out/controller/python --args=" \
-          target_os=\"linux\" \
-          target_cpu=\"arm\" \
-          sysroot=\"/opt/raspberry-buster-armhf-sysroot\" \
-          enable_rtti=true \
-          chip_crypto=\"boringssl\" \
-          chip_mdns=\"platform\" \
-          chip_enable_ble=true \
-          treat_warnings_as_errors=false \
-          chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
-          chip_python_package_prefix=\"chip\""
+          scripts/build/gn_gen.sh --args=" \
+            target_os=\"linux\" \
+            target_cpu=\"arm\" \
+            sysroot=\"/opt/raspberry-buster-armhf-sysroot\" \
+            enable_rtti=true \
+            chip_crypto=\"boringssl\" \
+            chip_mdns=\"platform\" \
+            chip_enable_ble=true \
+            treat_warnings_as_errors=false \
+            chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
+            chip_python_package_prefix=\"chip\" \
+          "
 
       - name: Build Python controller (chip-core)
         working-directory: project-chip
