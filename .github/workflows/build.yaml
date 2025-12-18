@@ -85,7 +85,7 @@ jobs:
   build_linux_armv7_python_lib:
     name: Build Python wheels (ARMv7)
     needs: build_prepare
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
 
