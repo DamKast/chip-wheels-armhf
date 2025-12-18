@@ -81,17 +81,16 @@ jobs:
 
       - name: Package Matter SDK
         run: |
-          tar -caf ../connectedhomeip.tar.zst \
+          tar -czf ../connectedhomeip.tar.gz \
             --exclude ./connectedhomeip/.environment \
-            --use-compress-program=zstdmt \
             .
-          mv ../connectedhomeip.tar.zst ./connectedhomeip.tar.zst
+          mv ../connectedhomeip.tar.gz ./connectedhomeip.tar.gz
 
       - name: Upload Matter SDK artifact
         uses: actions/upload-artifact@v4
         with:
           name: matter-sdk-${{ github.run_id }}
-          path: connectedhomeip.tar.zst
+          path: connectedhomeip.tar.gz
 
   build_linux_armv7_python_lib:
     name: Build Python wheels (ARMv7)
@@ -101,7 +100,7 @@ jobs:
       contents: write
 
     container:
-      image: damienkastner/chip-build-crosscompile-armhf:0.6.25 
+      image: zzebra83/chip-build-crosscompile-armhf:0.7.25
       options: >-
         --sysctl net.ipv6.conf.all.disable_ipv6=0
         --sysctl net.ipv4.conf.all.forwarding=1
@@ -121,7 +120,7 @@ jobs:
         working-directory: ./
         run: |
           rm -rf connectedhomeip/
-          tar -xaf ./connectedhomeip.tar.zst --use-compress-program=zstdmt .
+          tar -xzf ./connectedhomeip.tar.gz .
           git config --global --add safe.directory "*"
 
       - name: Bootstrap (container)
