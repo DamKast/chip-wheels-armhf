@@ -99,7 +99,6 @@ jobs:
     permissions:
       contents: write
 
-
     container:
       image: zzebra83/chip-build-crosscompile-armhf:0.7.25
       options: >-
