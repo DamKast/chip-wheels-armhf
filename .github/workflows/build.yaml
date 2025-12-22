@@ -136,7 +136,7 @@ jobs:
             enable_rtti=true \
             chip_crypto=\"boringssl\" \
             chip_mdns=\"minimal\" \
-            chip_minmdns_default_policy=\"libnl\" \
+            chip_minmdns_default_policy=\"default\" \
             chip_config_memory_debug_checks=false \
             chip_config_memory_debug_dmalloc=false \
             chip_exchange_node_id_logging=true \
