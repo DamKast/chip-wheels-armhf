@@ -143,6 +143,7 @@ jobs:
             chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
             chip_python_package_prefix=\"chip\" \
             chip_code_pre_generated_directory=\"$(pwd)/zzz_pregenerated\" \
+            treat_warnings_as_errors=false \
           "
           scripts/run_in_build_env.sh "ninja -C out matter-repl"
 
