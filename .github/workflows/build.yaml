@@ -142,7 +142,6 @@ jobs:
             chip_exchange_node_id_logging=true \
             chip_python_version=\"${{ needs.build_prepare.outputs.version }}\" \
             chip_python_package_prefix=\"chip\" \
-            chip_python_platform_tag=\"manylinux2014_armv7l\" \
             chip_code_pre_generated_directory=\"$(pwd)/zzz_pregenerated\" \
           "
           scripts/run_in_build_env.sh "ninja -C out matter-repl"
